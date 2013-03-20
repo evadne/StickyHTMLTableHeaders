@@ -124,7 +124,6 @@ tr:not(:first-child) td:first-child {
 	overflow: hidden;
 	-webkit-transform: translate3d(0, 0, 0);
 }
-
 #wrapper {
 	top: 32px;
 	left: 32px;
