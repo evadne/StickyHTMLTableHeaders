@@ -16,3 +16,5 @@ HTML, with a lot of additional stuff. Highlights:
 *	[Scroller](https://github.com/zynga/scroller)
 *	[AntiScroll](http://learnboost.github.com/antiscroll/)
 *	[JSizes](http://www.bramstein.com/projects/jsizes/)
+*	[Modernizr](http://modernizr.com)
+*	[jQuery CSS Transforms](http://www.zachstronaut.com/posts/2009/08/07/jquery-animate-css-rotate-scale.html)

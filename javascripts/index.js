@@ -46,8 +46,8 @@ document.addEventListener("DOMContentLoaded", function() {
 		
 					this.mutating = true;
 		
-					$leftColumnContainer.width($leftColumnCells[0].getBoundingClientRect().width);// + "px";
-					$topRowContainer.height($topRowCells[0].getBoundingClientRect().height);// + "px";
+					$leftColumnContainer.width($leftColumnCells[0].getBoundingClientRect().width);
+					$topRowContainer.height($topRowCells[0].getBoundingClientRect().height);
 					
 					$leftColumnTable = $("<table>")
 						.css("position", "relative")
@@ -106,8 +106,6 @@ document.addEventListener("DOMContentLoaded", function() {
 					
 					var containerOffsetX = Math.floor(Math.max(0, left)) + "px";
 					var containerOffsetY = Math.floor(Math.max(0, top)) + "px";
-					var elementOffsetX = -1 * Math.floor(Math.max(0, left)) + "px";
-					var elementOffsetY = -1 * Math.floor(Math.max(0, top)) + "px";
 					
 					topRowContainer.style.width = Math.round(containerRect.width + Math.min(0, tableRect.right - containerRect.right)) + "px";
 					topRowContainer.style.left = containerOffsetX;
@@ -119,11 +117,6 @@ document.addEventListener("DOMContentLoaded", function() {
 					
 					topRowContainer.scrollLeft = left;
 					leftColumnContainer.scrollTop = top;
-					// $topRowTable[0].style.left = elementOffsetX;
-					// $leftColumnTable[0].style.top = elementOffsetY;
-					
-					// topRowContainer.scrollLeft = left;
-					// leftColumnContainer.scrollTop = top;
 					
 				});
 		
