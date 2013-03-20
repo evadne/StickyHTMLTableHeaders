@@ -34,22 +34,23 @@
 		}
 		tr:first-child td {
 			z-index: 10;
-			position: relative;
+			background: rgb(240, 240, 240);
 		}
 		tr td:first-child {
 			background: rgb(240, 240, 240);
-			position: relative;
 			z-index: -1;
 		}
+		tr:first-child td {
+			position: relative;
+		}
+		tr td:first-child {
+			position: relative;
+		}
 		tr:first-child td:first-child {
-			background: inherit;
-			position: inherit;
-			z-index: inherit;
+			z-index: 128;
 		}
 		td {
-			height: 3em;
-			padding-left: 1em;
-			padding-right: 1em;
+			padding: 1em;
 			white-space: nowrap;
 			position: relative;
 			z-index: -2;
@@ -66,12 +67,15 @@
 			content: "";
 			pointer-events: none;
 		}
-		tr td:first-child:after {
+		tr:first-child td:first-child:after {
+		}
+		
+		tr:not(:first-child) td:first-child:after {
 			z-index: 1;
 		}
 		tr:first-child td:after {
 		}
-		tr:first-child td {
+		tr:first-child td:not(:first-child) {
 			box-shadow:
 				inset 0px -1px 0.5px rgb(180, 180, 180),
 				0px 1px 0.5px rgba(0, 0, 0, 0);
@@ -88,14 +92,58 @@
 				1px 0px 0.5px rgba(0, 0, 0, 0);
 			-webkit-transition: box-shadow 0.25s;
 		}
-		.leftScrolled tr:not(:first-child) td:first-child {
+		.leftScrolled tr td:first-child {
 			box-shadow:
 				inset -1px 0px 0.5px rgb(160, 160, 160),
 				1px 0px 0.5px rgba(0, 0, 0, .125);
 		}
+		.topRow {
+			position: fixed;
+/*			border: 1px solid red;*/
+		}
+		.leftColumn {
+			position: fixed;
+			top: 0px;
+			width: 128px;
+			bottom: 0px;
+			left: 0px;
+			z-index: 1024;
+			box-sizing: border-box;
+			visibility: hidden;
+			height: 100%:
+			overflow: hidden;
+			box-shadow: 0px 0px 4px green;
+		}
+		.topRow {
+			position: fixed;
+			top: 0px;
+			right: 0px;
+			left: 0px;
+			bottom: auto;
+			z-index: 1024;
+			visibility: hidden;
+			width: 100%;
+			overflow: hidden;
+			box-shadow: 0px 0px 4px red;
+		}
+			.topRow td {
+				height: 100%;
+			}
+		
+		#wrapper {
+			top: 32px;
+			left: 32px;
+			bottom: 32px;
+			right: 32px;
+			position: absolute;
+			overflow: scroll;
+		}
+		
 	</style>
 </head>
 <body>
+	<div id="wrapper">
+		<div id="content">
 	<table>
 		<tr>
 			<td></td>
@@ -303,7 +351,7 @@
 		</tr>
 		<tr>
 			<td>Andrew Moore</td>
-			<td>Andrea Morgan</td>
+			<td>Andrea Morgan<br />Andrea Morgan<br />Andrea Morgan<br />Andrea Morgan</td>
 			<td>Virginia Garza</td>
 			<td>Dennis Barnes</td>
 			<td>Scott Lane</td>
@@ -3770,37 +3818,165 @@
 			<td>Janet Howard</td>
 		</tr>
 	</table>
+	
+	<div class="leftColumn"></div>
+	<div class="topRow"></div>	
+	
+		</div>
+	</div>
+	
+	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+	
+	<script>
+		/*
+		 * jQuery resize event - v1.1 - 3/14/2010
+		 * http://benalman.com/projects/jquery-resize-plugin/
+		 * 
+		 * Copyright (c) 2010 "Cowboy" Ben Alman
+		 * Dual licensed under the MIT and GPL licenses.
+		 * http://benalman.com/about/license/
+		 */
+		(function($,h,c){var a=$([]),e=$.resize=$.extend($.resize,{}),i,k="setTimeout",j="resize",d=j+"-special-event",b="delay",f="throttleWindow";e[b]=250;e[f]=true;$.event.special[j]={setup:function(){if(!e[f]&&this[k]){return false}var l=$(this);a=a.add(l);$.data(this,d,{w:l.width(),h:l.height()});if(a.length===1){g()}},teardown:function(){if(!e[f]&&this[k]){return false}var l=$(this);a=a.not(l);l.removeData(d);if(!a.length){clearTimeout(i)}},add:function(l){if(!e[f]&&this[k]){return false}var n;function m(s,o,p){var q=$(this),r=$.data(this,d);r.w=o!==c?o:q.width();r.h=p!==c?p:q.height();n.apply(this,arguments)}if($.isFunction(l)){n=l;return m}else{n=l.handler;l.handler=m}}};function g(){i=h[k](function(){a.each(function(){var n=$(this),m=n.width(),l=n.height(),o=$.data(this,d);if(m!==o.w||l!==o.h){n.trigger(j,[o.w=m,o.h=l])}});g()},e[b])}})(jQuery,this);
+	</script>
+	
 	<script type="text/javascript">
 		
-		var table = document.body.querySelector("table");
-		var topRow = document.body.querySelector("table tr:first-child");
-		var allTopRowCells = document.body.querySelectorAll("table tr:first-child td");
-		var allLeftColumnCells = document.body.querySelectorAll("table tr td:first-child");
+		var usesCustomScrolling = Modernizr.touch;
 		
-		document.addEventListener("scroll", function (event) {
+		var scrollSource = document.body.querySelector("#wrapper");
+		var container = document.body.querySelector("#wrapper");
+		
+		var table = container.querySelector("table");
+		var topRow = container.querySelector("table tr:first-child");
+		
+		var allTopRowCells = container.querySelectorAll("table tr:first-child td");
+		var firstRowCells = container.querySelectorAll("table tr:first-child + tr td");
+		
+		var allLeftColumnCells = container.querySelectorAll("table tr td:first-child");
+		var firstColumnCells = container.querySelectorAll("table tr td:first-child + td");
+		
+		var leftColumnContainer = container.querySelector(".leftColumn");
+		var topRowContainer = container.querySelector(".topRow");
+		
+		leftColumnContainer.style.overflow = "hidden";
+		topRowContainer.style.overflow ="hidden";		
+				
+		((function(){
 			
-			var offsetLeft = Math.max(0, document.body.scrollLeft);
-			var offsetTop = Math.max(0, document.body.scrollTop);
+			((function () {
+				
+				var resetHeaders = function (event) {
+				
+					if (table.mutating)
+						return;
+				
+					table.mutating = true;
+				
+					leftColumnContainer.style.width = allLeftColumnCells[0].getBoundingClientRect().width + "px";
+					topRowContainer.style.height = allTopRowCells[0].getBoundingClientRect().height + "px";
+				
+					$(topRowContainer).empty().append(
+						$("<table>").append(
+							$("<tr>").append(
+								$.map(allTopRowCells, function(obj, i) {
+								  return $(obj).clone(false)
+										.css("min-width", obj.getBoundingClientRect().width + "px")
+										.css("box-sizing", "border-box");
+								})
+							)
+						)
+					);
+				
+					$(leftColumnContainer).empty().append(
+						$("<table>").append(
+							$.map(allLeftColumnCells, function (obj, i) {
+								return $("<tr>").append(
+									$(obj).clone(false)
+										.css("height", obj.getBoundingClientRect().height + "px")
+										.css("box-sizing", "border-box")
+									);
+							})
+						)
+					);
+					
+					table.mutating = false;
+				
+				}
 			
-			var transformX = "translateX(" + offsetLeft + "px)";
-			var transformY = "translateY(" + offsetTop + "px)";
+				table.addEventListener("DOMSubtreeModified", resetHeaders);
+				resetHeaders();
+				
+			})());
 			
-			for (var i = 1; i < allLeftColumnCells.length; i++){
-				var cell = allLeftColumnCells[i];
-				cell.style.webkitTransform = transformX;
+			((function () {
+				
+				var repositionHeaders = function (event) {
+					containerRect = container.getBoundingClientRect();
+					topRowContainer.style.top = containerRect.top + "px";
+					topRowContainer.style.left = containerRect.left + "px";
+					topRowContainer.style.right = (document.body.clientWidth - containerRect.right) + "px";
+					topRowContainer.style.width = "auto";
+					leftColumnContainer.style.top = containerRect.top + "px";
+					leftColumnContainer.style.left = containerRect.left + "px";
+					leftColumnContainer.style.bottom = (document.body.clientHeight - containerRect.bottom) + "px";
+					leftColumnContainer.style.height = "auto";
+				}
+				$(window).resize(repositionHeaders);
+				repositionHeaders();
+				
+			})())
+			
+			if (Modernizr.touch) {
+				
+				// document.body.style.overflow = "hidden";
+				// 
+				// container.style.position = "fixed";
+				// container.style.top = "0px";
+				// container.style.left = "0px";
+				// container.style.right = "0px";
+				// container.style.bottom = "0px";
+				// container.style.overflow = "scroll";
+				// container.style.webkitOverflowScrolling = "touch";
+				
+				// var tile = function (event) {
+				// 	leftColumnContainer.scrollTop = container.scrollTop;
+				// 	topRowContainer.scrollLeft = container.scrollLeft;
+				// };
+				// 
+				// wrapper.addEventListener("touchmove", function (event) {
+				// 	console.log("touchmove");
+				// 	tile(event);
+				// });
+				// 
+				// wrapper.addEventListener("scroll", function (event) {
+				// 	console.log("scroll");
+				// 	tile(event);
+				// });
+				
+			} else {
+				
+				var tile = function (event) {
+					leftColumnContainer.scrollTop = container.scrollTop;
+					topRowContainer.scrollLeft = container.scrollLeft;
+				};
+				
+				document.addEventListener("scroll", function (event) {
+					tile(event);
+				});
+				
+				container.addEventListener("scroll", function (event) {
+					tile(event);
+				});
+			
+				tile();
+				
 			}
 			
-			topRow.style.webkitTransform = transformY;
-			
-			offsetLeft ?
-				table.classList.add("leftScrolled") :
-				table.classList.remove("leftScrolled");
-			
-			offsetTop ?
-				table.classList.add("topScrolled") :
-				table.classList.remove("topScrolled");
-						
-		});
+			leftColumnContainer.style.visibility = "visible";
+			topRowContainer.style.visibility = "visible";
+		
+		})());
 		
 	</script>
 </body>
