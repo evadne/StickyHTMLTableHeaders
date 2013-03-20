@@ -107,7 +107,6 @@ tr:not(:first-child) td:first-child {
 	visibility: hidden;
 	width: 100%;
 	overflow: hidden;
-	box-shadow: 0px 0px 4px red;
 	-webkit-transform: translate3d(0, 0, 0);
 }
 	.topRow td {
@@ -123,7 +122,6 @@ tr:not(:first-child) td:first-child {
 	visibility: hidden;
 	height: 100%:
 	overflow: hidden;
-	box-shadow: 0px 0px 4px green;
 	-webkit-transform: translate3d(0, 0, 0);
 }
 

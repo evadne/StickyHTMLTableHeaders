@@ -3,111 +3,129 @@ document.addEventListener("DOMContentLoaded", function() {
 	window.setTimeout(function () {
 	
 		var scrollSource = document.body.querySelector("#wrapper");
-		var container = document.body.querySelector("#wrapper");
-	
-		var table = container.querySelector("table");
-		var topRow = container.querySelector("table tr:first-child");
-
-		var allTopRowCells = container.querySelectorAll("table tr:first-child td");
-		var firstRowCells = container.querySelectorAll("table tr:first-child + tr td");
-
-		var allLeftColumnCells = container.querySelectorAll("table tr td:first-child");
-		var firstColumnCells = container.querySelectorAll("table tr td:first-child + td");
-	
-		var leftColumnContainer = container.querySelector(".leftColumn");
-		var topRowContainer = container.querySelector(".topRow");
-
-		leftColumnContainer.style.overflow = "hidden";
-		topRowContainer.style.overflow ="hidden";		
+		var $container = $("#wrapper");
+		var $element = $container.children("#content");
+		
+		var $table = $container.find("table");
+		
+		$table.find("tr").each(function(idx, obj) {
+			if (idx > 10) {
+				$(obj).remove();
+			}
+			$(obj).find("td").each(function(idx, obj) {
+				if (idx > 10) {
+					$(obj).remove();
+				}
+			})
+		});
+		
+		var $topRow = $table.children("tr:first-child");
+		
+		var $leftColumnContainer = $container.find(".leftColumn");
+		var $topRowContainer = $container.find(".topRow");
+		
+		var $topRowCells = $table.find("tr:first-child td");
+		var $firstRowCells = $table.find("tr:first-child + tr td");
+		var $leftColumnCells = $table.find("tr td:first-child");
+		var $firstColumnCells = $table.find("tr td:first-child + td");
+		
+		$leftColumnContainer.css("overflow", "hidden");
+		$topRowContainer.css("overflow", "hidden");	
+		
+		var $leftColumnTable;
+		var $topRowTable;
 		
 		((function(){
-	
+			
 			((function () {
 		
-				var resetHeaders = function (event) {
+				$table.bind("DOMSubtreeModified", function (event) {
 		
-					if (table.mutating)
+					if (this.mutating)
 						return;
 		
-					table.mutating = true;
+					this.mutating = true;
 		
-					leftColumnContainer.style.width = allLeftColumnCells[0].getBoundingClientRect().width + "px";
-					topRowContainer.style.height = allTopRowCells[0].getBoundingClientRect().height + "px";
-		
-					$(topRowContainer).empty().append(
-						$("<table>").append(
-							$("<tr>").append(
-								$.map(allTopRowCells, function(obj, i) {
-								  return $(obj).clone(false)
-										.css("min-width", obj.getBoundingClientRect().width + "px")
-										.css("box-sizing", "border-box");
-								})
-							)
-						)
-					);
-		
-					$(leftColumnContainer).empty().append(
-						$("<table>").append(
-							$.map(allLeftColumnCells, function (obj, i) {
+					$leftColumnContainer.width($leftColumnCells[0].getBoundingClientRect().width);// + "px";
+					$topRowContainer.height($topRowCells[0].getBoundingClientRect().height);// + "px";
+					
+					$leftColumnTable = $("<table>")
+						.css("position", "relative")
+						.append(
+							$.map($leftColumnCells, function (obj, i) {
 								return $("<tr>").append(
 									$(obj).clone(false)
 										.css("height", obj.getBoundingClientRect().height + "px")
 										.css("box-sizing", "border-box")
 									);
 							})
-						)
-					);
-			
-					table.mutating = false;
+						);
+					
+					$topRowTable = $("<table>")
+						.css("position", "relative")
+						.append(
+							$("<tr>").append(
+								$.map($topRowCells, function(obj, i) {
+								  return $(obj).clone(false)
+										.css("min-width", obj.getBoundingClientRect().width + "px")
+										.css("box-sizing", "border-box");
+								})
+							)
+						);
 		
-				}
-	
-				table.addEventListener("DOMSubtreeModified", resetHeaders);
-				resetHeaders();
+					$leftColumnContainer.empty().append($leftColumnTable);
+					$topRowContainer.empty().append($topRowTable);
+			
+					this.mutating = false;
+		
+				}).trigger("DOMSubtreeModified");
 		
 			})());
 	
-			var element = container.querySelector("#content");
-			var tableRect = table.getBoundingClientRect();
-			element.style.width = tableRect.width + "px";
-			element.style.height = tableRect.height + "px";
+			var tableRect = $table[0].getBoundingClientRect();
+			$element.width(tableRect.width);
+			$element.height(tableRect.height);
 	
-			if ('ontouchstart' in window) {
+			if (('ontouchstart' in window)) {
 		
-				var tile = function (event, left, top) {
-
-					var containerRect = container.getBoundingClientRect();
-					var tableRect = table.getBoundingClientRect();
-			
-					topRowContainer.style.width = containerRect.width + Math.min(0, tableRect.right - containerRect.right) + "px";
-					topRowContainer.style.left = Math.max(0, left) + "px";
-					topRowContainer.style.top = Math.max(0, top) + "px";
-					topRowContainer.scrollLeft = left;
-			
-					leftColumnContainer.style.height = containerRect.height + Math.min(0, tableRect.bottom - containerRect.bottom) + "px";
-					leftColumnContainer.style.left = Math.max(0, left) + "px";
-					leftColumnContainer.style.top = Math.max(0, top) + "px";
-					leftColumnContainer.scrollTop = top;
-			
-				};
-		
-				new EasyScroller(element, {
+				new EasyScroller($element[0], {
+					
 					scrollingX: true,
 					scrollingY: true,
 					zooming: false,
 					minZoom: 1.0,
 					maxZoom: 1.0
+					
 				}, function (left, top, zoom) {
-					tile(null, left, top);
+					
+					var topRowContainer = $topRowContainer[0];
+					var leftColumnContainer = $leftColumnContainer[0];
+					
+					var containerRect = $container[0].getBoundingClientRect();
+					var tableRect = $table[0].getBoundingClientRect();
+					
+					var containerOffsetX = Math.floor(Math.max(0, left)) + "px";
+					var containerOffsetY = Math.floor(Math.max(0, top)) + "px";
+					
+					topRowContainer.style.width = Math.round(containerRect.width + Math.min(0, tableRect.right - containerRect.right)) + "px";
+					topRowContainer.style.left = containerOffsetX;
+					topRowContainer.style.top = containerOffsetY;
+					topRowContainer.scrollLeft = left;
+					
+					leftColumnContainer.style.height = Math.round(containerRect.height + Math.min(0, tableRect.bottom - containerRect.bottom)) + "px";
+					leftColumnContainer.style.left = containerOffsetX;
+					leftColumnContainer.style.top = containerOffsetY;
+					leftColumnContainer.scrollTop = top;
+					
 				});
 		
 			} else {
-	
-				container.style.overflow = "scroll";
+				
+				$container.css("overflow", "scroll");
 		
 				var tile = function (event, left, top) {
-					leftColumnContainer.scrollTop = top || container.scrollTop;
-					topRowContainer.scrollLeft = left || container.scrollLeft;
+					$leftColumnContainer[0].scrollTop = top || $container[0].scrollTop;
+					$topRowContainer[0].scrollLeft = left || $container[0].scrollLeft;
 				};
 			
 				var size;
@@ -116,10 +134,13 @@ document.addEventListener("DOMContentLoaded", function() {
 					// http://stackoverflow.com/questions/986937/how-can-i-get-the-browsers-scrollbar-sizes
 					// http://www.alexandre-gomes.com/?p=115
 					// https://github.com/LearnBoost/antiscroll/pull/40
+					
+					var $inner = $("<p>").width("100%").height("200px");
+					var inner = $inner[0];
 				
-				  var inner = document.createElement('p');
-				  inner.style.width = "100%";
-				  inner.style.height = "200px";
+				  // var inner = document.createElement('p');
+				  // inner.style.width = "100%";
+				  // inner.style.height = "200px";
 
 				  var outer = document.createElement('div');
 				  outer.style.position = "absolute";
@@ -144,20 +165,26 @@ document.addEventListener("DOMContentLoaded", function() {
 				};
 			
 				$(window).resize(function (event) {
-					containerRect = container.getBoundingClientRect();
-					topRowContainer.style.top = containerRect.top + "px";
-					topRowContainer.style.left = containerRect.left + "px";
-					topRowContainer.style.right = (document.body.clientWidth - containerRect.right) + "px";
-					topRowContainer.style.width = "auto";
-					leftColumnContainer.style.top = containerRect.top + "px";
-					leftColumnContainer.style.left = containerRect.left + "px";
-					leftColumnContainer.style.bottom = (document.body.clientHeight - containerRect.bottom) + "px";
-					leftColumnContainer.style.height = "auto";
+					
+					var containerRect = $container[0].getBoundingClientRect();
+					
+					$topRowContainer
+						.css("top", containerRect.top)
+						.css("left", containerRect.left)
+						.css("right", (document.body.clientWidth - containerRect.right))
+						.css("width", "auto");
+						
+					$leftColumnContainer
+						.css("top", containerRect.top)
+						.css("left", containerRect.left)
+						.css("bottom", (document.body.clientHeight - containerRect.bottom))
+						.css("height", "auto");
+					
 				}).trigger("resize");
 			
 				if (scrollbarSize() <= 0) {
 			
-					container.addEventListener("scroll", function (event) {
+					$container.bind("scroll", function (event) {
 						tile(event);
 					});
 
@@ -177,19 +204,19 @@ document.addEventListener("DOMContentLoaded", function() {
 				
 					}
 				
-					var $container = $(container);
+					// var $container = $(container);
 					var $box = $("<div>").addClass("antiscroll-box");
 					var $inner = $("<div>").addClass("antiscroll-inner");
 			
-					$(container)
+					$container
 						.css("overflow", "hidden")
 						.addClass("antiscroll-wrap").children().wrap($box);
 			
-					$(element).wrap($inner);
+					$element.wrap($inner);
 					$inner = $(element).parent("div").first();
 			
 					massageSize($container, $box, $inner);
-					$(container).antiscroll();
+					$container.antiscroll();
 					massageSize($container, $box, $inner);
 			
 					$inner[0].addEventListener("scroll", function (event) {
@@ -200,9 +227,9 @@ document.addEventListener("DOMContentLoaded", function() {
 			
 			}
 		
-			$(table).addClass("initialized");
-			leftColumnContainer.style.visibility = "visible";
-			topRowContainer.style.visibility = "visible";
+			$table.addClass("initialized");
+			$leftColumnContainer.css("visibility", "visible");
+			$topRowContainer.css("visibility", "visible");
 
 		})());
 	
